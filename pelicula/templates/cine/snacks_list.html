@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snacks</title>
+</head>
+<body>
+
+<h1>Snacks de la entrada {{ entrada_id }}</h1>
+
+{% for snack in snacks %}
+    <p>Producto: {{ snack.producto }}</p>
+    <p>Cantidad: {{ snack.cantidad }}</p>
+    <p>Precio unitario: {{ snack.precio_unitario }}</p>
+    <hr>
+{% endfor %}
+
+<p><strong>Total snacks: </strong>S/. {{ total_snacks }}</p>
+
+</body>
+</html>

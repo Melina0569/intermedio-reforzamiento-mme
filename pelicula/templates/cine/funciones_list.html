@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Funciones</title>
+</head>
+<body>
+
+<h1>Funciones de {{ pelicula.titulo }}</h1>
+
+{% for funcion in funciones %}
+    <p>Hora: {{ funcion.hora }}</p>
+    <p>Precio: {{ funcion.precio }}</p>
+    <p>Estado: {{ funcion.estado }}</p>
+    <hr>
+{% endfor %}
+
+</body>
+</html>

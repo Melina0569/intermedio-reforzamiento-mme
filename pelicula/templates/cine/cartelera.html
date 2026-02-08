@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cartelera</title>
+</head>
+<body>
+
+<h1>Cartelera activa</h1>
+
+{% for pelicula in peliculas %}
+    <p>Id: {{ pelicula.id }}</p>
+    <p>Título: {{ pelicula.titulo }}</p>
+    <hr>
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de películas</title>
+</head>
+<body>
+<h1>Mis peliculas</h1>
+    {% for owner in data %}
+    <p>Id: {{owner.id}}</p>
+    <p>Título: {{owner.titulo}}</p>
+    <p>Duración: {{owner.duracion_min}}</p>
+    <p>Género: {{owner.genero}}</p>
+    <p>Clasificación: {{owner.clasificacion}}</p>
+    {% endfor %}
+
+</body>
+</html>
