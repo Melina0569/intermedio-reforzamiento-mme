@@ -1,0 +1,21 @@
+{% extends "cine/base.html" %}
+
+{% block content %}
+
+<h2>Búsqueda de Película</h2>
+
+{% if pelicula %}
+<div class="card p-3">
+    <h4>{{ pelicula.titulo }}</h4>
+    <p><strong>Género:</strong> {{ pelicula.genero }}</p>
+    <p><strong>Clasificación:</strong> {{ pelicula.clasificacion }}</p>
+    <p><strong>Duración:</strong> {{ pelicula.duracion_min }} min</p>
+</div>
+
+{% else %}
+<div class="alert alert-danger">
+    No se encontró la película
+</div>
+{% endif %}
+
+{% endblock %}

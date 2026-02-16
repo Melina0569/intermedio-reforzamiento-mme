@@ -1,31 +1,108 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+
+from .models import Pelicula, Funcion
+from .forms import PeliculaForm
+
 
 def peliculas_list_view(request):
-    data_context = [
-        {
-            "id": 1,
-            "titulo": "Avengers",
-            "duracion_min": 143,
-            "genero": "Acción",
-            "clasificacion": "PG-13"
-        },
-        {
-            "id": 2,
-            "titulo": "Titanic",
-            "duracion_min": 195,
-            "genero": "Drama",
-            "clasificacion": "PG-13"
-        },
-        {
-            "id": 3,
-            "titulo": "Toy Story",
-            "duracion_min": 81,
-            "genero": "Animación",
-            "clasificacion": "G"
-        },
-    ]
+    peliculas = Pelicula.objects.all()
 
-    return render(request, 'cine/peliculas_list.html', context={'data': data_context})
+    return render(request,'cine/peliculas_list.html',context={'peliculas': peliculas})
+
+
+def pelicula_create_view(request):
+
+    if request.method == 'POST':
+        form = PeliculaForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            print("✅ Guardado correctamente")
+            return redirect('peliculas_list')
+
+        else:
+            print("❌ Errores del formulario:", form.errors)
+
+    else:
+        form = PeliculaForm()
+
+    return render(request, 'cine/pelicula_form.html', {'form': form})
+
+def pelicula_unica_view(request):
+
+    titulo = request.GET.get('titulo')
+    clasificacion = request.GET.get('clasificacion')
+
+    pelicula = None
+
+    if titulo and clasificacion:
+        try:
+            pelicula = Pelicula.objects.get(
+                titulo=titulo,
+                clasificacion=clasificacion
+            )
+        except Pelicula.DoesNotExist:
+            pelicula = None
+
+    return render(request, 'cine/pelicula_unica.html', {'pelicula': pelicula})
+
+def peliculas_contiene_view(request):
+    texto = request.GET.get('q', '')
+
+    peliculas = Pelicula.objects.filter(titulo__icontains=texto) if texto else []
+
+    context = {
+        'peliculas': peliculas,
+        'texto': texto
+    }
+
+    return render(request, 'cine/peliculas_contiene.html', context)
+
+def peliculas_termina_view(request):
+
+    texto = request.GET.get('q', '')
+
+    if texto:
+        peliculas = Pelicula.objects.filter(titulo__iendswith=texto)
+    else:
+        peliculas = []
+
+    context = {
+        'peliculas': peliculas,
+        'texto': texto
+    }
+
+    return render(request, 'cine/peliculas_termina.html', context)
+
+def funciones_orden_mixto_view(request):
+
+    funciones = Funcion.objects.order_by('estado', '-fecha_hora')
+
+    context = {
+        'funciones': funciones
+    }
+
+    return render(request, 'cine/funciones_orden_mixto.html', context)
+
+def peliculas_actualizar(request):
+    # 1️⃣ Obtener parámetros del GET
+    pref = request.GET.get('pref', '')  # prefijo del género o título
+    nueva_clasificacion = request.GET.get('nueva_clasificacion', '')  # nueva clasificación
+
+    # 2️⃣ Actualización masiva usando ORM
+    if pref and nueva_clasificacion:
+        Pelicula.objects.filter(genero__startswith=pref).update(clasificacion=nueva_clasificacion)
+
+    # 3️⃣ Consultar las películas que coinciden con el prefijo después de actualizar
+    peliculas = Pelicula.objects.filter(genero__startswith=pref).order_by("titulo")
+
+    # 4️⃣ Enviar al template
+    context = {
+        'peliculas': peliculas,
+        'pref': pref,
+        'nueva_clasificacion': nueva_clasificacion
+    }
+    return render(request, 'cine/peliculas_actualizar.html', context)
 
 def pelicula_detail_view(request, id):
     pelicula_encontrada = None

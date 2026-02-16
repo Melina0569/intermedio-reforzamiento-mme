@@ -1,18 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Home Cine</title>
-</head>
-<body>
+{% extends "cine/base.html" %}
 
-<h1>{{ nombre_cine }}</h1>
+{% block title %}Inicio{% endblock %}
 
-<h2>Película destacada</h2>
-<p>{{ pelicula_destacada }}</p>
+{% block content %}
 
-<h2>Total de funciones hoy</h2>
-<p>{{ total_funciones }}</p>
+<div class="row">
 
-</body>
-</html>
+  <div class="col-md-12 text-center">
+    <h1 class="mb-4">{{ nombre_cine }}</h1>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-body">
+        <h5>Película destacada</h5>
+        <p>{{ pelicula_destacada }}</p>
+        <button class="btn btn-primary">Ver detalles</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-body">
+        <h5>Funciones hoy</h5>
+        <p class="display-6">{{ total_funciones }}</p>
+        <button class="btn btn-success">Ver cartelera</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

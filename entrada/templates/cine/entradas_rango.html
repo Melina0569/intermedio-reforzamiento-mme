@@ -1,0 +1,34 @@
+{% extends "cine/base.html" %}
+
+{% block content %}
+
+<h2>Entradas (rango 4 a 6)</h2>
+
+<table class="table table-striped table-bordered">
+  <thead class="table-dark">
+    <tr>
+      <th>Función</th>
+      <th>Código</th>
+      <th>Asiento</th>
+      <th>Vendido</th>
+      <th>Fecha venta</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in entradas %}
+    <tr class="{% if e.vendido %}table-success{% else %}table-warning{% endif %}">
+      <td>{{ e.funcion }}</td>
+      <td>{{ e.codigo }}</td>
+      <td>{{ e.asiento }}</td>
+      <td>{% if e.vendido %}Sí{% else %}No{% endif %}</td>
+      <td>{{ e.fecha_venta|date:"d/m/Y H:i" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5">No hay entradas</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

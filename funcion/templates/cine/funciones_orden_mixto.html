@@ -1,0 +1,32 @@
+{% extends "cine/base.html" %}
+
+{% block content %}
+
+<h2>Funciones ordenadas</h2>
+
+<table class="table table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Película</th>
+      <th>Estado</th>
+      <th>Fecha y hora</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in funciones %}
+    <tr>
+      <td>{{ f.pelicula.titulo }}</td>
+      <td>{{ f.estado }}</td>
+      <td>{{ f.fecha_hora }}</td>
+      <td>S/. {{ f.precio }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="4">No hay funciones registradas</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "cine/base.html" %}
+
+{% block content %}
+
+<h2>Búsqueda por final del título</h2>
+
+<form method="get" class="mb-4">
+  <div class="row">
+    <div class="col-md-8">
+      <input type="text" name="q" class="form-control"
+             placeholder="Ej: Story"
+             value="{{ texto }}">
+    </div>
+    <div class="col-md-4">
+      <button type="submit" class="btn btn-success">
+        Buscar
+      </button>
+    </div>
+  </div>
+</form>
+
+{% if peliculas %}
+
+<table class="table table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Título</th>
+      <th>Género</th>
+      <th>Clasificación</th>
+      <th>Duración</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in peliculas %}
+    <tr>
+      <td>{{ p.titulo }}</td>
+      <td>{{ p.genero }}</td>
+      <td>{{ p.clasificacion }}</td>
+      <td>{{ p.duracion_min }} min</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% elif texto %}
+
+<div class="alert alert-warning">
+  No se encontraron resultados
+</div>
+
+{% endif %}
+
+{% endblock %}
