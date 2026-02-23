@@ -1,0 +1,35 @@
+{% extends "cine/base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <h2 class="mb-4 text-danger">Eliminar Película</h2>
+
+      <p class="fs-5">
+        ¿Estás segura de que deseas eliminar la película:
+        <strong>{{ object.titulo }}</strong>?
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <button type="submit" class="btn btn-danger">
+          Sí, eliminar
+        </button>
+
+        <a href="{% url 'peliculas_list' %}" class="btn btn-secondary">
+          Cancelar
+        </a>
+
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

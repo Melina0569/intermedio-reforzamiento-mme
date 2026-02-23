@@ -1,33 +1,12 @@
 from django.shortcuts import render, redirect
-
-from .models import Pelicula, Funcion
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import Pelicula, Funcion, SnackCompra
 from .forms import PeliculaForm
-
-
-def peliculas_list_view(request):
-    peliculas = Pelicula.objects.all()
-
-    return render(request,'cine/peliculas_list.html',context={'peliculas': peliculas})
-
-
-def pelicula_create_view(request):
-
-    if request.method == 'POST':
-        form = PeliculaForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            print("✅ Guardado correctamente")
-            return redirect('peliculas_list')
-
-        else:
-            print("❌ Errores del formulario:", form.errors)
-
-    else:
-        form = PeliculaForm()
-
-    return render(request, 'cine/pelicula_form.html', {'form': form})
-
+from rest_framework import generics
+from rest_framework.filters import SearchFilter
+from .serializers import PeliculaSerializer, SnackSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 def pelicula_unica_view(request):
 
     titulo = request.GET.get('titulo')
@@ -222,5 +201,37 @@ def home_view(request):
     return render(request,"cine/home.html",context={"nombre_cine": "Cine San Marcos","pelicula_destacada": "Avengers","total_funciones": 12})
 
 
+class PeliculaList(ListView):
+    model = Pelicula
+    template_name = 'cine/peliculas_list.html'
+    context_object_name = 'peliculas'
 
 
+class PeliculaCreate(CreateView):
+    model = Pelicula
+    form_class = PeliculaForm
+    template_name = 'cine/pelicula_form.html'
+    success_url = reverse_lazy('peliculas_list')
+
+class PeliculaUpdate(UpdateView):
+    model = Pelicula
+    form_class = PeliculaForm
+    template_name = 'cine/pelicula_form.html'
+    success_url = reverse_lazy('peliculas_list')
+
+class PeliculaDelete(DeleteView):
+    model = Pelicula
+    template_name = 'cine/pelicula_confirm_delete.html'
+    success_url = reverse_lazy('peliculas_list')
+
+class PeliculaSearchAPI(generics.ListAPIView):
+    queryset = Pelicula.objects.all()
+    serializer_class = PeliculaSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['titulo', 'genero', 'clasificacion']
+
+class SnackListAPIView(generics.ListAPIView):
+    queryset = SnackCompra.objects.all()
+    serializer_class = SnackSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['nombre', 'tipo']  # campos por los que se puede filtrar
