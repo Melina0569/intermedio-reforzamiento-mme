@@ -1,10 +1,6 @@
 from django.urls import path
 from . import views
-<<<<<<< HEAD
 from .views import PeliculaList, PeliculaCreate, PeliculaUpdate, PeliculaDelete, PeliculaSearchAPI, PeliculasTopVendidasAPIView, PeliculaCreateAPIView, PeliculaDeleteAPIView, ActualizarPreciosSnacksAPIView
-=======
-from .views import PeliculaList, PeliculaCreate, PeliculaUpdate, PeliculaDelete, PeliculaSearchAPI
->>>>>>> fa15de0d684b09b0734c34e2a24de3f417f2a78c
 
 urlpatterns = [
     path('peliculas/', PeliculaList.as_view(), name='peliculas_list'),
@@ -25,12 +21,9 @@ urlpatterns = [
     path('api/buscar/', PeliculaSearchAPI.as_view(), name='api_peliculas_buscar'),
     path('eliminar/<int:pk>/', PeliculaDelete.as_view(), name='pelicula_delete'),
     path('api/snacks/', views.SnackListAPIView.as_view(), name='api_snacks'),
-<<<<<<< HEAD
     path('top-vendidas/', PeliculasTopVendidasAPIView.as_view(), name='top_vendidas'),
     path('crear/', PeliculaCreateAPIView.as_view()),
     path('eliminar/<int:pk>/', PeliculaDeleteAPIView.as_view()),
     path('snacks/actualizar-precios/', ActualizarPreciosSnacksAPIView.as_view()),
-=======
->>>>>>> fa15de0d684b09b0734c34e2a24de3f417f2a78c
 
 ]
