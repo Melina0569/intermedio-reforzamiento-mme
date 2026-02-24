@@ -7,6 +7,7 @@ from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from .serializers import PeliculaSerializer, SnackSerializer
 from django_filters.rest_framework import DjangoFilterBackend
+<<<<<<< HEAD
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Count, Q, F
 from rest_framework.permissions import IsAdminUser
@@ -15,6 +16,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
+=======
+>>>>>>> fa15de0d684b09b0734c34e2a24de3f417f2a78c
 def pelicula_unica_view(request):
 
     titulo = request.GET.get('titulo')
@@ -213,6 +216,7 @@ class PeliculaList(ListView):
     model = Pelicula
     template_name = 'cine/peliculas_list.html'
     context_object_name = 'peliculas'
+<<<<<<< HEAD
     permission_classes = [IsAuthenticated]
 
 
@@ -313,5 +317,35 @@ class ActualizarPreciosSnacksAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+=======
+>>>>>>> fa15de0d684b09b0734c34e2a24de3f417f2a78c
 
 
+class PeliculaCreate(CreateView):
+    model = Pelicula
+    form_class = PeliculaForm
+    template_name = 'cine/pelicula_form.html'
+    success_url = reverse_lazy('peliculas_list')
+
+class PeliculaUpdate(UpdateView):
+    model = Pelicula
+    form_class = PeliculaForm
+    template_name = 'cine/pelicula_form.html'
+    success_url = reverse_lazy('peliculas_list')
+
+class PeliculaDelete(DeleteView):
+    model = Pelicula
+    template_name = 'cine/pelicula_confirm_delete.html'
+    success_url = reverse_lazy('peliculas_list')
+
+class PeliculaSearchAPI(generics.ListAPIView):
+    queryset = Pelicula.objects.all()
+    serializer_class = PeliculaSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['titulo', 'genero', 'clasificacion']
+
+class SnackListAPIView(generics.ListAPIView):
+    queryset = SnackCompra.objects.all()
+    serializer_class = SnackSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['nombre', 'tipo']  # campos por los que se puede filtrar
