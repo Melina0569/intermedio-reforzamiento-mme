@@ -8,6 +8,7 @@ class Entrada(models.Model):
     asiento = models.CharField(max_length=5)
     vendido = models.BooleanField(default=False)
     fecha_venta = models.DateTimeField(null=True, blank=True)
+    precio_final = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.codigo} - {self.asiento}"

@@ -1,32 +1,19 @@
 from django.shortcuts import render, redirect
-
-from .models import Pelicula, Funcion
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import Pelicula, Funcion, SnackCompra
 from .forms import PeliculaForm
+from rest_framework import generics
+from rest_framework.filters import SearchFilter
+from .serializers import PeliculaSerializer, SnackSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Count, Q, F
+from rest_framework.permissions import IsAdminUser
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
-
-def peliculas_list_view(request):
-    peliculas = Pelicula.objects.all()
-
-    return render(request,'cine/peliculas_list.html',context={'peliculas': peliculas})
-
-
-def pelicula_create_view(request):
-
-    if request.method == 'POST':
-        form = PeliculaForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            print("✅ Guardado correctamente")
-            return redirect('peliculas_list')
-
-        else:
-            print("❌ Errores del formulario:", form.errors)
-
-    else:
-        form = PeliculaForm()
-
-    return render(request, 'cine/pelicula_form.html', {'form': form})
 
 def pelicula_unica_view(request):
 
@@ -221,6 +208,110 @@ def cartelera_view(request):
 def home_view(request):
     return render(request,"cine/home.html",context={"nombre_cine": "Cine San Marcos","pelicula_destacada": "Avengers","total_funciones": 12})
 
+
+class PeliculaList(ListView):
+    model = Pelicula
+    template_name = 'cine/peliculas_list.html'
+    context_object_name = 'peliculas'
+    permission_classes = [IsAuthenticated]
+
+
+class PeliculaCreate(CreateView):
+    model = Pelicula
+    form_class = PeliculaForm
+    template_name = 'cine/pelicula_form.html'
+    success_url = reverse_lazy('peliculas_list')
+    permission_classes = [IsAuthenticated]
+
+class PeliculaUpdate(UpdateView):
+    model = Pelicula
+    form_class = PeliculaForm
+    template_name = 'cine/pelicula_form.html'
+    success_url = reverse_lazy('peliculas_list')
+    permission_classes = [IsAuthenticated]
+
+class PeliculaDelete(DeleteView):
+    model = Pelicula
+    template_name = 'cine/pelicula_confirm_delete.html'
+    success_url = reverse_lazy('peliculas_list')
+    permission_classes = [IsAuthenticated]
+
+class PeliculaSearchAPI(generics.ListAPIView):
+    queryset = Pelicula.objects.all()
+    serializer_class = PeliculaSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['titulo', 'genero', 'clasificacion']
+    permission_classes = [IsAuthenticated]
+
+class SnackListAPIView(generics.ListAPIView):
+    queryset = SnackCompra.objects.all()
+    serializer_class = SnackSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['nombre', 'tipo']  # campos por los que se puede filtrar
+    permission_classes = [IsAuthenticated]
+
+class PeliculasTopVendidasAPIView(generics.ListAPIView):
+    serializer_class = PeliculaSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Pelicula.objects
+            .annotate(
+                total_entradas_vendidas=Count(
+                    'funcion__entrada',
+                    filter=Q(funcion__entrada__vendido=True)
+                )
+            )
+            .filter(total_entradas_vendidas__gte=1)
+            .order_by('-total_entradas_vendidas')
+        )
+
+class PeliculaCreateAPIView(generics.CreateAPIView):
+    queryset = Pelicula.objects.all()
+    serializer_class = PeliculaSerializer
+    permission_classes = [IsAuthenticated]
+
+class PeliculaDeleteAPIView(generics.DestroyAPIView):
+    queryset = Pelicula.objects.all()
+    serializer_class = PeliculaSerializer
+    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
+
+class ActualizarPreciosSnacksAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        min_precio = request.data.get("min_precio")
+        descuento = request.data.get("descuento")
+
+        # Validar datos obligatorios
+        if min_precio is None or descuento is None:
+            return Response(
+                {"error": "Debe enviar min_precio y descuento"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Obtener snacks que cumplen condición
+        snacks = SnackCompra.objects.filter(precio__gte=min_precio)
+
+        # Validar que descuento no sea mayor al precio
+        for snack in snacks:
+            if descuento > snack.precio:
+                return Response(
+                    {"error": f"El descuento no puede ser mayor al precio del snack {snack.nombre}"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        # Actualización masiva con F expression
+        snacks.update(precio= F('precio') - descuento)
+
+        # Refrescar queryset actualizado
+        snacks_actualizados = SnackCompra.objects.filter(precio__gte=0)
+
+        serializer = SnackSerializer(snacks_actualizados, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
